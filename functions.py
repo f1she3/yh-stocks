@@ -1,5 +1,7 @@
 from pytickersymbols import PyTickerSymbols
 import yfinance as yf
+from datetime import date
+import pandas as pd
 
 # Returns the yahoo symbols of all companies
 # from the specified asset name (country name, or index)
@@ -18,36 +20,36 @@ def getCompanies(name, index=False):
             companies.append((name,symbol))
     return companies
 
-def getDividends(symbols):
+def getDividends(symbols, years=1):
     dividends = []
     for symbol in symbols:
-        apy = getApy(symbol)
+        apy = getAvgApy(symbol, years=years)
         dividends.append(apy) 
     return dividends
-def getApy(symbol):
-    ticker = yf.Ticker(symbol)
-    hist = ticker.history(period="1y")
-    avgPrice = hist['Open'].mean()
-    if 'Dividends' in hist:
-        dividends = hist['Dividends'].sum()
-    else:
-        dividends = None
-    if dividends is not None:
-        if dividends > 0:
-            # APY (%)
-            apy = dividends / avgPrice * 100
-        else:
-            apy = 0
-    else:
-        apy = None
-    """
-    key = 'trailingAnnualDividendYield'
-    if(key in ticker.info):
-        tady = ticker.info['trailingAnnualDividendYield']
-        if tady is not None:
-            tady = tady * 100
-    else:
-        tady = None
-    """
 
-    return apy
+"""
+Returns the mean of APYs since the previous "years" years
+"""
+def getAvgApy(symbol, years=5):
+    ticker = yf.Ticker(symbol)
+    today = date.today()
+    avgApy = 0
+    for k in range(years):
+        # The end day does not seem to be included
+        # So we do day + 1
+        start = date(today.year - years + k, today.month, today.day)
+        end = date(today.year - years + k + 1, today.month, today.day + 1)
+        hist = ticker.history(start=start, end=end)
+        if 'Dividends' in hist:
+            dividends = hist['Dividends'].sum()
+        else:
+            dividends = None
+        avgPrice = hist['Open'].mean()
+        if dividends is not None:
+            apy = dividends/avgPrice
+            avgApy += apy * 100/years
+        else:
+            avgApy = None
+            break
+
+    return avgApy
