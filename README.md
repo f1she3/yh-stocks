@@ -1,4 +1,4 @@
-# yh-dividends
+# yh-stocks
 
 ## Credits
 * [ranaroussi](https://github.com/ranaroussi) for his [yfinance](https://github.com/ranaroussi/yfinance) API
