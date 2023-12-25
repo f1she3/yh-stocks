@@ -1,4 +1,4 @@
-# yh-dividends
+# yh-stocks
 ## Quickstart
 1. Install [Python poetry](https://python-poetry.org/docs/)
 2. Execute : <br>
