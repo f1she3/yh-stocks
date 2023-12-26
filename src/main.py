@@ -8,7 +8,7 @@ from functions import *
 index = False
 asset = 'France'
 
-companies = getCompanies(asset, index=index)
+companies = get_companies(asset, index=index)
 names = []
 symbols = []
 
@@ -18,17 +18,24 @@ for company in companies:
     names.append(name)
     symbols.append(symbol)
 
-# Get their APY
-apys = getDividends(symbols, years=1)
-avgApys = getDividends(symbols, years=5)
+# Set the number of years used for the average formula
+avg_len = 8
+
+# Calculate the relevant kpis (APY, Avg APYs, ROI)
+kpis = calc_kpis(symbols, avg_len=avg_len)
 
 df = pd.DataFrame({
     'Name': names,
     'Symbol': symbols,
-    'APY (1y)': apys,
-    'APY (5y)': avgApys
+    'ROI (%)': kpis["roi"],
+    f"Avg ROI (%, {avg_len}y)": kpis["avgRoi"],
+    'APY (%)': kpis["apy"],
+    f"Avg APY (%, {avg_len}y)": kpis["avgApy"]
 })
-df = df.sort_values(by=['APY (1y)'], ascending=False)
+df = df.sort_values(
+    by=['ROI (%)'],
+    ascending=False
+)
 
 base_out_dir = "output"
 final_dir = ""
@@ -44,4 +51,4 @@ path = os.path.join(out_dir, f"{asset}.csv")
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
-df.to_csv(path)
+df.to_csv(path, index=False)

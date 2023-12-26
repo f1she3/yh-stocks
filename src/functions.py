@@ -8,7 +8,7 @@ from the specified asset name (country name, or index)
 """
 
 
-def getCompanies(name, index=False):
+def get_companies(name, index=False):
     stock_data = PyTickerSymbols()
     if index:
         rawSymbols = list(stock_data.get_stocks_by_index(name))
@@ -24,12 +24,33 @@ def getCompanies(name, index=False):
     return companies
 
 
-def getDividends(symbols, years=1):
-    dividends = []
+"""
+Returns the relevant Key Performance Indicators (KPI)
+of the securities defined in "symbols"
+(APY, Avg APY, ROI)
+"""
+
+
+def calc_kpis(symbols, avg_len):
+    result = {
+        "roi": [],
+        "avgRoi": [],
+        "apy": [],
+        "avgApy": [],
+    }
     for symbol in symbols:
-        apy = getAvgApy(symbol, years=years)
-        dividends.append(apy)
-    return dividends
+        ticker = yf.Ticker(symbol)
+
+        roi = kpi_get_roi(ticker)
+        avg_roi = get_avg_kpi(ticker, years=avg_len, kpi_func=kpi_get_roi)
+        apy = kpi_get_apy(ticker)
+        avg_apy = get_avg_kpi(ticker, years=avg_len, kpi_func=kpi_get_apy)
+
+        result["roi"].append(roi)
+        result["avgRoi"].append(avg_roi)
+        result["apy"].append(apy)
+        result["avgApy"].append(avg_apy)
+    return result
 
 
 """
@@ -37,7 +58,7 @@ APY (yield) = dividends / start price
 """
 
 
-def getApy(ticker, start, end):
+def kpi_get_apy(ticker, start=date.today().replace(month=1, day=1), end=date.today()):
     hist = ticker.history(start=start, end=end)
     apy = None
     if not hist.empty:
@@ -52,6 +73,8 @@ def getApy(ticker, start, end):
             print(f"Error while calculating the APY for {tickerName}")
         else:
             apy = dividends / start_price
+        # Get a percentage
+        apy *= 100
 
     return apy
 
@@ -61,7 +84,7 @@ ROI (profitability) = end price - start price + dividends / start price
 """
 
 
-def getRoi(ticker, start, end):
+def kpi_get_roi(ticker, start=date.today().replace(month=1, day=1), end=date.today()):
     hist = ticker.history(start=start, end=end)
     roi = None
     if not hist.empty:
@@ -77,19 +100,21 @@ def getRoi(ticker, start, end):
             print(f"Error while calculating the ROI for {tickerName}")
         else:
             roi = (end_price - start_price + dividends) / start_price
+        # Get a percentage
+        roi *= 100
 
     return roi
 
 
 """
-Returns the mean of APYs since the previous "years" years
+Returns the average value for the KPI function "kpi_func", for the security whose symbol is "symbol",
+for the past "years" years
 """
 
 
-def getAvgApy(symbol, years=5):
-    ticker = yf.Ticker(symbol)
+def get_avg_kpi(ticker, years, kpi_func):
     today = date.today()
-    avgApy = 0
+    avgKpi = 0
     total = years
     for k in range(years):
         start = today.replace(
@@ -97,21 +122,19 @@ def getAvgApy(symbol, years=5):
             month=1,
             # The end day does not seem to be included
             # So we do day + 1
-            day=2
+            day=1
         )
         end = start.replace(year=start.year+1)
         # The end date can't be in the future
         if (end > date.today()):
             end = date.today()
-        apy = getApy(ticker=ticker, start=start, end=end)
+        kpi = kpi_func(ticker=ticker, start=start, end=end)
         # Skip the value if the execution went wrong
-        if apy == None:
+        if kpi == None:
             total -= 1
             continue
         else:
-            avgApy += apy/total
+            avgKpi += kpi/total
             break
-    # Get a percentage
-    avgApy *= 100
 
-    return avgApy
+    return avgKpi

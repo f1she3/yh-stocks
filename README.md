@@ -1,4 +1,5 @@
 # yh-stocks
+
 ## Quickstart
 1. Install [Python poetry](https://python-poetry.org/docs/)
 2. Execute : <br>
@@ -9,6 +10,6 @@
 * [portfolioplus](https://github.com/portfolioplus) for their [pytickersymbols](https://github.com/portfolioplus/pytickersymbols)
 
 ## Todo
-* [ ] Add ROI
-* [ ] Add a column for every year (think of the format : 1 column for APY & 1 for ROI ... ?)
-- [ ] Implement nice CLI interface ([Rich](https://github.com/Textualize/rich) for example)
+* [x] Add ROI
+* [ ] Add a column for every year (think about the format: 1 column for APY & 1 for ROI ... ?)
+* [ ] Implement nice CLI interface ([Rich](https://github.com/Textualize/rich) for example)
