@@ -3,24 +3,32 @@ import yfinance as yf
 from datetime import date
 
 """
-Returns the yahoo symbols of all companies
-from the specified asset name (country name, or index)
+Returns the yahoo symbols of all the companies
+belonging to the specified index or country
 """
 
 
-def get_companies(name, index=False):
+def get_companies_list(name="France", is_index=False, is_country=True):
     stock_data = PyTickerSymbols()
-    if index:
-        rawSymbols = list(stock_data.get_stocks_by_index(name))
+    if is_country:
+        raw_symbols = list(stock_data.get_stocks_by_country(name))
+    elif is_index:
+        raw_symbols = list(stock_data.get_stocks_by_index(name))
     else:
-        rawSymbols = list(stock_data.get_stocks_by_country(name))
-    companies = []
-    for company in rawSymbols:
+        raise Exception(
+            "get_companies_list() : The symbol must either be an index or a country.")
+    companies = {
+        "names": [],
+        "symbols": []
+    }
+    for company in raw_symbols:
         name = company['name']
         symbols = company['symbols']
         if len(company['symbols']) > 0:
+            # Get the company's symbol on Yahoo Finance
             symbol = symbols[0]['yahoo']
-            companies.append((name, symbol))
+            companies["names"].append(name)
+            companies["symbols"].append(symbol)
     return companies
 
 

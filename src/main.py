@@ -5,18 +5,13 @@ import pandas as pd
 from functions import *
 
 # True if asset is an index, False if it's a country
-index = False
-asset = 'France'
+is_index = False
+is_country = True
+name = 'France'
 
-companies = get_companies(asset, index=index)
-names = []
-symbols = []
-
-# Get companies names & symbols
-for company in companies:
-    name, symbol = company
-    names.append(name)
-    symbols.append(symbol)
+companies = get_companies_list(name, is_index=is_index, is_country=is_country)
+names = companies["names"]
+symbols = companies["symbols"]
 
 # Set the number of years used for the average formula
 avg_len = 8
@@ -32,23 +27,18 @@ df = pd.DataFrame({
     'APY (%)': kpis["apy"],
     f"Avg APY (%, {avg_len}y)": kpis["avgApy"]
 })
+
+# Sort values by ROI
 df = df.sort_values(
     by=['ROI (%)'],
     ascending=False
 )
 
 base_out_dir = "output"
-final_dir = ""
 
-if index:
-    final_dir = "indices"
-else:
-    final_dir = "countries"
+path = os.path.join(base_out_dir, f"{name}.csv")
+if not os.path.exists(base_out_dir):
+    os.makedirs(base_out_dir)
 
-out_dir = os.path.join(base_out_dir, final_dir)
-
-path = os.path.join(out_dir, f"{asset}.csv")
-if not os.path.exists(out_dir):
-    os.makedirs(out_dir)
-
+# Write result to csv file
 df.to_csv(path, index=False)
