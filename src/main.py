@@ -6,15 +6,27 @@ from functions import *
 
 # True if asset is an index, False if it's a country
 is_index = False
-is_country = True
-name = 'France'
+# is_country = True
+is_country = False
+# name = 'France'
+name = "PSP5.PA"
 
-companies = get_companies_list(name, is_index=is_index, is_country=is_country)
+
+if is_index or is_country:
+    companies = get_companies_list(
+        name, is_index=is_index, is_country=is_country)
+else:
+    ticker = yf.Ticker(name)
+    companies = {
+        "names": [ticker.info["longName"]],
+        "symbols": [name]
+    }
+
 names = companies["names"]
 symbols = companies["symbols"]
 
 # Set the number of years used for the average formula
-avg_len = 8
+avg_len = 10
 
 # Calculate the relevant kpis (APY, Avg APYs, ROI)
 kpis = calc_kpis(symbols, avg_len=avg_len)

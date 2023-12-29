@@ -11,5 +11,6 @@
 
 ## Todo
 * [x] Add ROI
-* [ ] Add a column for every year (think about the format: 1 column for APY & 1 for ROI ... ?)
+* [ ] Use [yf.download](https://aroussi.com/post/python-yahoo-finance) for multi-threaded bulk downloading
+* [ ] Add a column for every year (maybe create a new dataframe for every stock)
 * [ ] Implement nice CLI interface ([Rich](https://github.com/Textualize/rich) for example)

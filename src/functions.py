@@ -63,10 +63,24 @@ def calc_kpis(symbols, avg_len):
 
 """
 APY (yield) = dividends / start price
+
+Calculated 
+    from December 31st, previous year 
+    (
+        to December 31st, this year
+        or 
+        to today's date
+    )
 """
 
 
-def kpi_get_apy(ticker, start=date.today().replace(month=1, day=1), end=date.today()):
+def kpi_get_apy(
+    ticker,
+    # yfinance: Start date included
+    start=date.today().replace(year=date.today().year - 1, month=12, day=31),
+    # yfinance: End date excluded
+    end=date.today()
+):
     hist = ticker.history(start=start, end=end)
     apy = None
     if not hist.empty:
@@ -89,10 +103,24 @@ def kpi_get_apy(ticker, start=date.today().replace(month=1, day=1), end=date.tod
 
 """
 ROI (profitability) = end price - start price + dividends / start price
+
+Calculated 
+    from December 31st, previous year (included)
+    (
+        to December 31st, this year (included)
+        or 
+        to today (excluded)
+    )
 """
 
 
-def kpi_get_roi(ticker, start=date.today().replace(month=1, day=1), end=date.today()):
+def kpi_get_roi(
+    ticker,
+    # yfinance: Start date included
+    start=date.today().replace(year=date.today().year - 1, month=12, day=31),
+    # yfinance: End date excluded
+    end=date.today()
+):
     hist = ticker.history(start=start, end=end)
     roi = None
     if not hist.empty:
@@ -110,13 +138,26 @@ def kpi_get_roi(ticker, start=date.today().replace(month=1, day=1), end=date.tod
             roi = (end_price - start_price + dividends) / start_price
         # Get a percentage
         roi *= 100
-
     return roi
 
 
 """
 Returns the average value for the KPI function "kpi_func", for the security whose symbol is "symbol",
 for the past "years" years
+
+I chose a year to be
+    from December 31st, previous year
+    to
+    (
+        December 31st, next year
+        or
+        today if (December 31st, next year) > today
+    )
+
+This is the most realiable way I found to have consistent data from yfinance.
+For some reason, if "2000-01-01" is used as "start", 
+the first value returned is "2000-01-02", a day later.
+With "1999-12-31", the first value corresponds indeed to "1999-12-31"
 """
 
 
@@ -127,10 +168,8 @@ def get_avg_kpi(ticker, years, kpi_func):
     for k in range(years):
         start = today.replace(
             year=today.year-years+k,
-            month=1,
-            # The end day does not seem to be included
-            # So we do day + 1
-            day=1
+            month=12,
+            day=31
         )
         end = start.replace(year=start.year+1)
         # The end date can't be in the future
@@ -143,6 +182,5 @@ def get_avg_kpi(ticker, years, kpi_func):
             continue
         else:
             avgKpi += kpi/total
-            break
 
     return avgKpi
