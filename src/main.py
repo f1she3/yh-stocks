@@ -2,14 +2,24 @@
 
 import os
 import pandas as pd
+import argparse
 from functions import *
 
-# True if asset is an index, False if it's a country
-is_index = False
-# is_country = True
-is_country = False
-# name = 'France'
-name = "PSP5.PA"
+# Dynamic arguments
+parser = argparse.ArgumentParser(description='Process some variables.')
+
+parser.add_argument('--is_index', type=lambda x: (str(x).lower() == 'true'), default=False,
+                    help='True if asset is an index, False if it\'s a country (default: False)')
+parser.add_argument('--is_country', type=lambda x: (str(x).lower() == 'true'), default=False,
+                    help='True if asset is a country, False otherwise (default: False)')
+parser.add_argument('--name', type=str, default='PSP5.PA',
+                    help='Name of the asset (default: \'PSP5.PA\')')
+
+args = parser.parse_args()
+
+is_index = args.is_index
+is_country = args.is_country
+name = args.name
 
 print("Fetching data...")
 
