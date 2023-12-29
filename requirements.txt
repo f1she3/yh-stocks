@@ -1,0 +1,5 @@
+numpy==1.26.2
+pandas==2.1.4
+pytickersymbols==1.15.0
+PyYAML==6.0.1
+yfinance==0.2.33
