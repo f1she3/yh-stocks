@@ -15,4 +15,4 @@
 * [x] Add ROI
 * [ ] Use [yf.download](https://aroussi.com/post/python-yahoo-finance) for multi-threaded bulk downloading
 * [ ] Add a column for every year (maybe create a new dataframe for every stock)
-* [ ] Implement nice CLI interface ([Rich](https://github.com/Textualize/rich) for example)
+* [x] Implement nice CLI interface ([Rich](https://github.com/Textualize/rich) for example)
