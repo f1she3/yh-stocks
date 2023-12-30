@@ -1,18 +1,11 @@
 # yh-stocks
 
 ## Quickstart
-### Automated
-* Execute:<br>
-`make run`
-
-This performs the  steps described in the next section.
-### Manual
 1. Install [Python poetry](https://python-poetry.org/docs/)
 2. Install dependencies:<br>
   `poetry install`
 3. Start the script:<br>
   `poetry run ./src/main.py`
-
 
 ## Credits
 * [ranaroussi](https://github.com/ranaroussi) for his [yfinance](https://github.com/ranaroussi/yfinance) API
