@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
 import pandas as pd
 from functions import *
+from rich.prompt import Prompt
 from logger_config import logger
+from pytickersymbols import PyTickerSymbols
 
+is_index, is_country = False, False
+stock_data = PyTickerSymbols()
 
-# Dynamic arguments
-parser = argparse.ArgumentParser(description='Process some variables.')
-
-parser.add_argument('--is_index', type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help='True if asset is an index, False if it\'s a country (default: False)')
-parser.add_argument('--is_country', type=lambda x: (str(x).lower() == 'true'), default=False,
-                    help='True if asset is a country, False otherwise (default: False)')
-parser.add_argument('--name', type=str, default='PSP5.PA',
-                    help='Name of the asset (default: \'PSP5.PA\')')
-
-args = parser.parse_args()
-
-is_index = args.is_index
-is_country = args.is_country
-name = args.name
+search_type = Prompt.ask(
+    "Select your search type", choices=["Stock", "Country", "Index"],  default="Stock")
+if search_type == "Stock":
+    name = Prompt.ask("Enter the symbol of the stock", default="DSY.PA")
+elif search_type == "Country":
+    is_country = True
+    countries = stock_data.get_all_countries()
+    name = Prompt.ask("Enter the name of the country",
+                      choices=countries, default="France")
+else:
+    is_index = True
+    indices = stock_data.get_all_indices()
+    name = Prompt.ask("Enter the symbol of the index",
+                      choices=indices, default="CAC 40")
 
 logger.info("Process started.")
 logger.debug("Fetching stocks data")
@@ -68,6 +70,7 @@ if not os.path.exists(base_out_dir):
     os.makedirs(base_out_dir)
 
 # Write result to csv file
-logger.debug("Writing result to CSV file")
+logger.debug("Writing result to CSV file \"%s\"", path)
 df.to_csv(path, index=False)
+logger.info("Output written to \"%s\"", path)
 logger.info("Process completed successfully.")
