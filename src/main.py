@@ -4,6 +4,8 @@ import argparse
 import os
 import pandas as pd
 from functions import *
+from logger_config import logger
+
 
 # Dynamic arguments
 parser = argparse.ArgumentParser(description='Process some variables.')
@@ -21,7 +23,8 @@ is_index = args.is_index
 is_country = args.is_country
 name = args.name
 
-print("Fetching data...")
+logger.info("Process started.")
+logger.debug("Fetching stocks data")
 if is_index or is_country:
     companies = get_companies_list(
         name, is_index=is_index, is_country=is_country)
@@ -40,7 +43,7 @@ avg_len = 10
 
 
 # Calculate the relevant kpis (APY, Avg APYs, ROI)
-print("Calculating KPIs...")
+logger.debug("Calculating KPIs")
 kpis = calc_kpis(symbols, avg_len=avg_len)
 
 df = pd.DataFrame({
@@ -65,6 +68,6 @@ if not os.path.exists(base_out_dir):
     os.makedirs(base_out_dir)
 
 # Write result to csv file
-print("Writing result to CSV file...")
+logger.debug("Writing result to CSV file")
 df.to_csv(path, index=False)
-print("Process completed successfully.")
+logger.info("Process completed successfully.")

@@ -1,6 +1,7 @@
 from pytickersymbols import PyTickerSymbols
 import yfinance as yf
 from datetime import date
+from logger_config import logger
 
 """
 Returns the yahoo symbols of all the companies
@@ -92,7 +93,7 @@ def kpi_get_apy(
         start_price = hist.iloc[0]['Open']
         if (start_price == 0):
             tickerName = ticker.get_info["longName"]
-            print(f"Error while calculating the APY for {tickerName}")
+            logger.warning(f"Error while calculating the APY for {tickerName}")
         else:
             apy = dividends / start_price
         # Get a percentage
@@ -133,7 +134,7 @@ def kpi_get_roi(
         end_price = hist.iloc[-1]['Open']
         if (start_price == 0):
             tickerName = ticker.get_info["longName"]
-            print(f"Error while calculating the ROI for {tickerName}")
+            logger.warning(f"Error while calculating the ROI for {tickerName}")
         else:
             roi = (end_price - start_price + dividends) / start_price
         # Get a percentage
