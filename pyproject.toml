@@ -15,7 +15,7 @@ pyyaml = "^6.0.1"
 rich = "^13.7.1"
 
 [tool.poetry.group.dev.dependencies]
-poetry = "^1.8.2"
+poetry = "^1.8.3"
 
 [build-system]
 requires = ["poetry-core"]
