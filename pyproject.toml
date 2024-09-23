@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.12"
 pytickersymbols = "^1.15.0"
 yfinance = "^0.2.43"
-pandas = "^2.2.2"
+pandas = "^2.2.3"
 pyyaml = "^6.0.2"
 rich = "^13.8.0"
 
