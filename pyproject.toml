@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 pytickersymbols = "^1.15.0"
-yfinance = "^0.2.44"
+yfinance = "^0.2.46"
 pandas = "^2.2.3"
 pyyaml = "^6.0.2"
 rich = "^13.9.2"
