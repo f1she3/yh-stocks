@@ -12,7 +12,7 @@ pytickersymbols = "^1.15.0"
 yfinance = "^0.2.66"
 pandas = "^2.3.3"
 pyyaml = "^6.0.3"
-rich = "^14.1.0"
+rich = "^14.2.0"
 
 [tool.poetry.group.dev.dependencies]
 poetry = "^2.2.1"
