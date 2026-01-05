@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pytickersymbols = "^1.15.0"
+pytickersymbols = "^1.16.1"
 yfinance = "^1.0.0"
 pandas = "^2.3.3"
 pyyaml = "^6.0.3"
