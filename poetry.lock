@@ -1198,14 +1198,14 @@ six = ">=1.5"
 
 [[package]]
 name = "pytickersymbols"
-version = "1.17.1"
+version = "1.17.5"
 description = "pytickersymbols provides access to google and yahoo ticker symbols"
 optional = false
 python-versions = "<4.0,>=3.11"
 groups = ["main"]
 files = [
-    {file = "pytickersymbols-1.17.1-py3-none-any.whl", hash = "sha256:5637b2928996dcde0b6e6da83c8ec9acd02a430e8a24027ab7bb39edb6e623be"},
-    {file = "pytickersymbols-1.17.1.tar.gz", hash = "sha256:fe5ef5789626bd3e813f87145b8ad8f663349cd7875ec72822384d62e3a4b6e6"},
+    {file = "pytickersymbols-1.17.5-py3-none-any.whl", hash = "sha256:a91d5ddd37e1704c34d8fc6516c620a4bbd097948e26584b71cbbbb389a1e217"},
+    {file = "pytickersymbols-1.17.5.tar.gz", hash = "sha256:b2eaa02ba8cd470196b95d700503be4b679d88b8c8c41457bbc350a503d2de27"},
 ]
 
 [package.dependencies]
@@ -1932,4 +1932,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "24e46abcfc5313d4d01e8c5e2b12e1b7f83a1489f3726a3552582d2e5e85c27b"
+content-hash = "2ca090d88fe27abff34ff3a182a1b5a0a271e7492f696cd6c768d237382e1fb9"
