@@ -195,6 +195,7 @@ files = [
     {file = "cffi-2.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:b882b3df248017dba09d6b16defe9b5c407fe32fc7c65a9c69798e6175601be9"},
     {file = "cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529"},
 ]
+markers = {dev = "sys_platform == \"linux\" or sys_platform == \"darwin\" or platform_python_implementation == \"PyPy\""}
 
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
@@ -347,6 +348,7 @@ description = "cryptography is a package which provides cryptographic recipes an
 optional = false
 python-versions = "!=3.9.0,!=3.9.1,>=3.8"
 groups = ["dev"]
+markers = "sys_platform == \"linux\""
 files = [
     {file = "cryptography-46.0.7-cp311-abi3-macosx_10_9_universal2.whl", hash = "sha256:ea42cbe97209df307fdc3b155f1b6fa2577c0defa8f1f7d3be7d31d189108ad4"},
     {file = "cryptography-46.0.7-cp311-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:b36a4695e29fe69215d75960b22577197aca3f7a25b9cf9d165dcfe9d80bc325"},
@@ -414,32 +416,45 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "curl-cffi"
-version = "0.10.0"
+version = "0.15.0"
 description = "libcurl ffi bindings for Python, with impersonation support."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "curl_cffi-0.10.0-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:15053d01c6a3e3c4c5331ce9e07e1dc31ca5aa063babca05d18b1b5aad369fac"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:3969e4260ad4dab638fb6dbe349623f9f5f022435c7fd21daf760231380367fa"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:458f53c41bd76d90d8974d60c3a8a0dd902a1af1f9056215cf24f454bcedc6fd"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:cfc74f09e44d2d8d61b8e8fda3a7004b5bc0217a703fbbe9e16ef8caa1f3d4e4"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f03f4b17dc679c82bd3c946feb1ad38749b2ad731d7c26daefaac857d1c72fd9"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:f1b0c7b7b81afca15a0e56c593d3c2bdcd4fd4c9ca49b9ded5b9d8076ba78ff9"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:04b1d23f0f54f94b8298ed417e6bece85a635d674723cde2b155da686efbf78f"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-win32.whl", hash = "sha256:1e60b8ecc80bfb0da4ff73ac9d194e80482b50ecbb8aefec1b0edaf45fafd80e"},
-    {file = "curl_cffi-0.10.0-cp39-abi3-win_amd64.whl", hash = "sha256:59389773a1556e087120e91eac1e33f84f1599d853e1bc168b153e4cdf360002"},
-    {file = "curl_cffi-0.10.0.tar.gz", hash = "sha256:3e37b35268ca58492f54ed020ae4b50c33ee0debad4145db9f746f04ed466eb0"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-macosx_10_9_x86_64.whl", hash = "sha256:bda66404010e9ed743b1b83c20c86f24fe21a9a6873e17479d6e67e29d8ded28"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:a25620d9bf989c9c029a7d1642999c4c265abb0bad811deb2f77b0b5b2b12e5b"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:582e570aa2586b96ed47cf4a17586b9a3c462cbe43f780487c3dc245c6ef1527"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:838e48212447d9c81364b04707a5c861daf08f8320f9ecb3406a8919d1d5c3b3"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2b6c847d86283b07ae69bb72c82eb8a59242277142aa35b89850f89e792a02fc"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:9e5e69eee735f659287e2c84444319d68a1fa68dd37abf228943a4074864283a"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-manylinux_2_34_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:aa1323950224db24f4c510d010b3affa02196ca853fb424191fa917a513d3f4b"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:41f80170ba844009273b2660da1964ec31e99e5719d16b3422ada87177e32e13"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:1977e1e12cfb5c11352cbb74acef1bed24eb7d226dab61ca57c168c21acd4d61"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-win_amd64.whl", hash = "sha256:5a0c1896a0d5a5ac1eb89cd24b008d2b718dd1df6fd2f75451b59ca66e49e572"},
+    {file = "curl_cffi-0.15.0-cp310-abi3-win_arm64.whl", hash = "sha256:a6d57f8389273a3a1f94370473c74897467bcc36af0a17336989780c507fa43d"},
+    {file = "curl_cffi-0.15.0-cp313-abi3-android_24_arm64_v8a.whl", hash = "sha256:4682dc38d4336e0eb0b185374db90a760efde63cbea994b4e63f3521d44c4c92"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:967ad7355bd8e9586f8c2d02eaa99953747549e7ea4a9b25cd53353e6b67fe6d"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:7e63539d0d839d0a8c5eacf86229bc68c57803547f35e0db7ee0986328b478c3"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:08c799b89740b9bc49c09fbc3d5907f13ac1f845ca52620507ef9466d4639dd5"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:7b7a92767a888ee90147e18964b396d8435ff42737030d6fb00824ffd6094805"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:829cc357061ecb99cc2d406301f609a039e05665322f5c025ec67c38b0dc49ce"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:408d6f14e346841cd889c2e0962832bb235ba3b6749ebf609f347f747da5e60f"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-win_amd64.whl", hash = "sha256:b624c7ce087bfda967a013ed0a64702a525444e5b6e97d23534d567ccc6525aa"},
+    {file = "curl_cffi-0.15.0-cp314-cp314t-win_arm64.whl", hash = "sha256:0b6c0543b993996670e9e4b78e305a2d60809d5681903ffb5568e21a387434d3"},
+    {file = "curl_cffi-0.15.0.tar.gz", hash = "sha256:ea0c67652bf6893d34ee0f82c944f37e488f6147e9421bef1771cc6545b02ded"},
 ]
 
 [package.dependencies]
 certifi = ">=2024.2.2"
-cffi = ">=1.12.0"
+cffi = ">=2.0.0"
+rich = "*"
 
 [package.extras]
 build = ["cibuildwheel", "wheel"]
-dev = ["charset_normalizer (>=3.3.2,<4.0)", "coverage (>=6.4.1,<7.0)", "cryptography (>=42.0.5,<43.0)", "httpx (==0.23.1)", "mypy (>=1.9.0,<2.0)", "pytest (>=8.1.1,<9.0)", "pytest-asyncio (>=0.23.6,<1.0)", "pytest-trio (>=0.8.0,<1.0)", "ruff (>=0.3.5,<1.0)", "trio (>=0.25.0,<1.0)", "trustme (>=1.1.0,<2.0)", "typing_extensions", "uvicorn (>=0.29.0,<1.0)", "websockets (>=12.0,<13.0)"]
-test = ["charset_normalizer (>=3.3.2,<4.0)", "cryptography (>=42.0.5,<43.0)", "fastapi (==0.110.0)", "httpx (==0.23.1)", "proxy.py (>=2.4.3,<3.0)", "pytest (>=8.1.1,<9.0)", "pytest-asyncio (>=0.23.6,<1.0)", "pytest-trio (>=0.8.0,<1.0)", "python-multipart (>=0.0.9,<1.0)", "trio (>=0.25.0,<1.0)", "trustme (>=1.1.0,<2.0)", "typing_extensions", "uvicorn (>=0.29.0,<1.0)", "websockets (>=12.0,<13.0)"]
+dev = ["charset_normalizer (>=3.3.2,<4.0)", "coverage (>=6.4.1,<7.0)", "cryptography (>=46.0.4,<47.0)", "httpx (==0.23.1)", "mypy (>=1.9.0,<2.0)", "pytest (>=8.1.1,<9.0)", "pytest-asyncio (>=0.23.6,<1.0)", "pytest-trio (>=0.8.0,<1.0)", "ruff (>=0.3.5,<1.0)", "trio (>=0.25.0,<1.0)", "trustme (>=1.1.0,<2.0)", "typing_extensions", "uvicorn (>=0.29.0,<1.0)", "websockets (>=14.0)"]
+extra = ["lxml_html_clean", "markdownify (>=1.1.0)", "readability-lxml (>=0.8.1)"]
+test = ["charset_normalizer (>=3.3.2,<4.0)", "cryptography (>=46.0.4,<47.0)", "httpx (==0.23.1)", "litestar (>=2.19.0,<3.0)", "proxy.py (>=2.4.3,<3.0)", "pytest (>=8.1.1,<9.0)", "pytest-asyncio (>=0.23.6,<1.0)", "pytest-trio (>=0.8.0,<1.0)", "python-multipart (>=0.0.9,<1.0)", "trio (>=0.25.0,<1.0)", "trustme (>=1.1.0,<2.0)", "typing_extensions", "uvicorn (>=0.29.0,<1.0)", "websockets (>=14.0)"]
 
 [[package]]
 name = "distlib"
@@ -1229,11 +1244,11 @@ description = "C parser in Python"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 groups = ["main", "dev"]
-markers = "implementation_name != \"PyPy\""
 files = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
     {file = "pycparser-2.21.tar.gz", hash = "sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206"},
 ]
+markers = {main = "implementation_name != \"PyPy\"", dev = "(sys_platform == \"linux\" or sys_platform == \"darwin\" or platform_python_implementation == \"PyPy\") and implementation_name != \"PyPy\""}
 
 [[package]]
 name = "pygments"
@@ -1871,19 +1886,19 @@ test = ["pytest"]
 
 [[package]]
 name = "yfinance"
-version = "1.2.0"
+version = "1.2.2"
 description = "Download market data from Yahoo! Finance API"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "yfinance-1.2.0-py2.py3-none-any.whl", hash = "sha256:1c27d1ebfc6275f476721cc6dba035a49d0cf9a806d6aa1785c9e10cf8a610d8"},
-    {file = "yfinance-1.2.0.tar.gz", hash = "sha256:80cec643eb983330ca63debab1b5492334fa1e6338d82cb17dd4e7b95079cfab"},
+    {file = "yfinance-1.2.2-py2.py3-none-any.whl", hash = "sha256:3b292f609e5ff27a8c2d850f5a3c6f10d7290f3b403346705d8d33524ff5745b"},
+    {file = "yfinance-1.2.2.tar.gz", hash = "sha256:00e4fb8f054c36a3b5dfa6920ba5f12301c4dc77d573f6b6872b94ec1a4fef3c"},
 ]
 
 [package.dependencies]
 beautifulsoup4 = ">=4.11.1"
-curl_cffi = ">=0.7,<0.14"
+curl_cffi = ">=0.15"
 frozendict = ">=2.3.4"
 multitasking = ">=0.0.7"
 numpy = ">=1.16.5"
