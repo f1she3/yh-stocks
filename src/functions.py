@@ -24,8 +24,8 @@ def get_companies_list(name="France", is_index=False, is_country=True):
     }
     for company in raw_symbols:
         name = company['name']
-        symbols = company['symbols']
-        if len(company['symbols']) > 0:
+        symbols = company.get('symbols', [])
+        if len(symbols) > 0:
             # Get the company's symbol on Yahoo Finance
             symbol = symbols[0]['yahoo']
             companies["names"].append(name)
