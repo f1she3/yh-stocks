@@ -164,8 +164,7 @@ With "1999-12-31", the first value corresponds indeed to "1999-12-31"
 
 def get_avg_kpi(ticker, years, kpi_func):
     today = date.today()
-    avgKpi = 0
-    total = years
+    values = []
     for k in range(years):
         start = today.replace(
             year=today.year-years+k,
@@ -173,15 +172,9 @@ def get_avg_kpi(ticker, years, kpi_func):
             day=31
         )
         end = start.replace(year=start.year+1)
-        # The end date can't be in the future
-        if (end > date.today()):
+        if end > date.today():
             end = date.today()
         kpi = kpi_func(ticker=ticker, start=start, end=end)
-        # Skip the value if the execution went wrong
-        if kpi == None:
-            total -= 1
-            continue
-        else:
-            avgKpi += kpi/total
-
-    return avgKpi
+        if kpi is not None:
+            values.append(kpi)
+    return sum(values) / len(values) if values else None

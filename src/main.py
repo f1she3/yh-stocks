@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+import logging
 import os
 import pandas as pd
 from functions import *
 from rich.prompt import Prompt
 from logger_config import logger
 from pytickersymbols import PyTickerSymbols
+
+logging.getLogger('yfinance').setLevel(logging.CRITICAL)
 
 is_index, is_country = False, False
 stock_data = PyTickerSymbols()
@@ -56,6 +59,9 @@ df = pd.DataFrame({
     'APY (%)': kpis["apy"],
     f"Avg APY (%, {avg_len}y)": kpis["avgApy"]
 })
+
+# Drop rows where no data was available (delisted symbols)
+df = df.dropna(subset=['ROI (%)'])
 
 # Sort values by ROI
 df = df.sort_values(
