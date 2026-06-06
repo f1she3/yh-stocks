@@ -24,8 +24,8 @@ def get_companies_list(name="France", is_index=False, is_country=True):
     }
     for company in raw_symbols:
         name = company['name']
-        symbols = company['symbols']
-        if len(company['symbols']) > 0:
+        symbols = company.get('symbols', [])
+        if len(symbols) > 0:
             # Get the company's symbol on Yahoo Finance
             symbol = symbols[0]['yahoo']
             companies["names"].append(name)
@@ -91,13 +91,10 @@ def kpi_get_apy(
             dividends = 0
         # The price at the begining of the year (First row of the dataframe)
         start_price = hist.iloc[0]['Open']
-        if (start_price == 0):
-            tickerName = ticker.get_info["longName"]
-            logger.warning(f"Error while calculating the APY for {tickerName}")
+        if start_price != 0:
+            apy = dividends / start_price * 100
         else:
-            apy = dividends / start_price
-        # Get a percentage
-        apy *= 100
+            logger.warning("Error while calculating the APY for %s", ticker.ticker)
 
     return apy
 
@@ -132,13 +129,10 @@ def kpi_get_roi(
         # The price at the begining of the year (First row of the dataframe)
         start_price = hist.iloc[0]['Open']
         end_price = hist.iloc[-1]['Open']
-        if (start_price == 0):
-            tickerName = ticker.get_info["longName"]
-            logger.warning(f"Error while calculating the ROI for {tickerName}")
+        if start_price != 0:
+            roi = (end_price - start_price + dividends) / start_price * 100
         else:
-            roi = (end_price - start_price + dividends) / start_price
-        # Get a percentage
-        roi *= 100
+            logger.warning("Error while calculating the ROI for %s", ticker.ticker)
     return roi
 
 
