@@ -1,9 +1,10 @@
 # ---- build stage ----
 FROM python:3.12-slim AS builder
-WORKDIR /build
 
 COPY --from=ghcr.io/astral-sh/uv:0.7 /uv /usr/local/bin/uv
 
+# Build the venv at /app/.venv so the shebang paths match the runtime stage exactly.
+WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
@@ -17,8 +18,8 @@ RUN groupadd --gid 10001 appgroup && \
 
 WORKDIR /app
 
-COPY --from=builder /build/.venv /app/.venv
-COPY --from=builder /build/src /app/src
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/src /app/src
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
