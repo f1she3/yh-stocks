@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}yh-stocks — Simulateur d'investissement{% endblock %}
+
+{% block body %}
+
+<form id="sim-form"
+  class="controls-sticky"
+  hx-post="/simulate"
+  hx-target="#results"
+  hx-swap="innerHTML"
+  hx-indicator="#spinner"
+  novalidate
+>
+  <div class="controls-bar">
+    <div class="controls-inner">
+      <span class="logo">yh-stocks</span>
+
+      <div class="controls-form">
+
+        <!-- Asset type -->
+        <div class="control-group">
+          <label for="search_type">Type</label>
+          <select id="search_type" name="search_type" onchange="toggleNameField(this.value)">
+            <option value="stock">Action</option>
+            <option value="index" selected>Indice</option>
+            <option value="country">Pays</option>
+          </select>
+        </div>
+
+        <!-- Name field (context-dependent) -->
+        <div class="control-group" id="field-stock" style="display:none">
+          <label for="name-stock">Symbole</label>
+          <input id="name-stock" type="text" placeholder="ex: MC.PA" style="width:110px">
+        </div>
+        <div class="control-group" id="field-index">
+          <label for="name-index">Indice</label>
+          <select id="name-index" name="name" style="width:130px">
+            {% for idx in indices %}
+            <option value="{{ idx }}" {% if idx == "CAC_40" %}selected{% endif %}>{{ idx }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="control-group" id="field-country" style="display:none">
+          <label for="name-country">Pays</label>
+          <select id="name-country" style="width:110px">
+            {% for c in countries %}
+            <option value="{{ c }}" {% if c == "France" %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="controls-sep"></div>
+
+        <!-- Investment parameters -->
+        <div class="control-group">
+          <label for="apport_initial">Apport initial</label>
+          <input id="apport_initial" name="apport_initial" type="number" min="1" step="100" value="10000" required style="width:90px">
+        </div>
+        <div class="control-group">
+          <label for="versement_mensuel">Versement/mois</label>
+          <input id="versement_mensuel" name="versement_mensuel" type="number" min="0" step="50" value="500" required style="width:80px">
+        </div>
+        <div class="control-group">
+          <label for="horizon_years">Horizon (ans)</label>
+          <input id="horizon_years" name="horizon_years" type="number" min="1" max="50" value="20" required style="width:60px">
+        </div>
+
+        <div class="controls-sep"></div>
+
+        <!-- Tax wrapper -->
+        <div class="control-group">
+          <label for="account_type">Enveloppe</label>
+          <select id="account_type" name="account_type" style="width:150px">
+            <option value="ALL" selected>CTO + PEA + AV</option>
+            <option value="CTO">CTO</option>
+            <option value="PEA">PEA</option>
+            <option value="AV">Assurance-vie</option>
+          </select>
+        </div>
+
+        <div class="controls-sep"></div>
+
+        <!-- Actions -->
+        <div class="control-group">
+          <label>&nbsp;</label>
+          <div class="control-actions">
+            <button type="button" class="btn-icon" id="btn-advanced" onclick="toggleAdvanced()">&#x2699; Avancé</button>
+            <button class="btn" type="submit">Mettre à jour</button>
+            <div id="spinner"><div class="spinner-ring"></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced settings (sticky with the controls bar, inside the same form) -->
+  <div class="advanced-panel" id="advanced-panel">
+    <div class="control-group">
+      <label for="courtage_pct">Courtage (%/versement)</label>
+      <input id="courtage_pct" name="courtage_pct" type="number" min="0" max="5" step="0.01" value="0.10" style="width:75px">
+    </div>
+    <div class="control-group">
+      <label for="frais_garde_pct">Frais de garde (%/an)</label>
+      <input id="frais_garde_pct" name="frais_garde_pct" type="number" min="0" max="2" step="0.01" value="0.10" style="width:75px">
+    </div>
+    <div class="control-group">
+      <label for="frais_gestion_av_pct">Gestion AV (%/an)</label>
+      <input id="frais_gestion_av_pct" name="frais_gestion_av_pct" type="number" min="0" max="2" step="0.01" value="0.75" style="width:75px">
+    </div>
+    <div class="control-group">
+      <label for="avg_len">Fenêtre historique (ans)</label>
+      <input id="avg_len" name="avg_len" type="number" min="1" max="20" value="10" style="width:60px">
+    </div>
+    <div class="control-group">
+      <label>&nbsp;</label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="is_couple" value="true">
+        Couple (abattement AV 9 200 €/an)
+      </label>
+    </div>
+  </div>
+</form>
+
+<main class="content">
+  <div id="results">
+    <div class="initial-loading">
+      <div class="spinner-ring spinner-ring-lg"></div>
+      <span>Chargement des données…</span>
+    </div>
+  </div>
+</main>
+
+<script>
+function toggleNameField(type) {
+  ['stock', 'index', 'country'].forEach(t => {
+    document.getElementById('field-' + t).style.display = t === type ? '' : 'none';
+  });
+  const active = document.querySelector('#field-' + type + ' input, #field-' + type + ' select');
+  if (active) active.name = 'name';
+  ['stock', 'index', 'country'].filter(t => t !== type).forEach(t => {
+    const el = document.querySelector('#field-' + t + ' input, #field-' + t + ' select');
+    if (el) el.removeAttribute('name');
+  });
+}
+
+function toggleAdvanced() {
+  const panel = document.getElementById('advanced-panel');
+  const btn = document.getElementById('btn-advanced');
+  const isOpen = panel.classList.toggle('open');
+  btn.classList.toggle('active', isOpen);
+}
+
+toggleNameField(document.getElementById('search_type').value);
+
+document.addEventListener('DOMContentLoaded', function() {
+  htmx.trigger(document.getElementById('sim-form'), 'submit');
+});
+</script>
+
+{% endblock %}

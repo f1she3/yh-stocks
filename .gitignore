@@ -1,2 +1,7 @@
 __pycache__
 output/*
+cache/
+.env
+.env.local
+.venv/
+*.pyc

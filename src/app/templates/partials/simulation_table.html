@@ -1,0 +1,30 @@
+<div style="overflow-x:auto">
+<table>
+  <thead>
+    <tr>
+      <th>Année</th>
+      <th class="num">Brut (€)</th>
+      <th class="num">CTO net (€)</th>
+      <th class="num">PEA net (€)</th>
+      <th class="num">AV net (€)</th>
+      <th class="num">Impôts CTO cum. (€)</th>
+      <th class="num">Impôts PEA cum. (€)</th>
+      <th class="num">Impôts AV cum. (€)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sim.snapshots %}
+    <tr>
+      <td>{{ s.year }}</td>
+      <td class="num">{{ "{:,.0f}".format(s.gross_value).replace(",", " ") }}</td>
+      <td class="num">{{ "{:,.0f}".format(s.cto_net).replace(",", " ") }}</td>
+      <td class="num">{{ "{:,.0f}".format(s.pea_net).replace(",", " ") }}</td>
+      <td class="num">{{ "{:,.0f}".format(s.av_net).replace(",", " ") }}</td>
+      <td class="num negative">{{ "{:,.0f}".format(s.cto_taxes).replace(",", " ") }}</td>
+      <td class="num negative">{{ "{:,.0f}".format(s.pea_taxes).replace(",", " ") }}</td>
+      <td class="num negative">{{ "{:,.0f}".format(s.av_taxes).replace(",", " ") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

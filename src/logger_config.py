@@ -1,37 +1,44 @@
 import logging
+import sys
+
+from pythonjsonlogger.json import JsonFormatter
 
 
-class CustomFormatter(logging.Formatter):
-    """Logging Formatter to add colors and count warning / errors"""
+class _ColorFormatter(logging.Formatter):
+    _grey = "\x1b[38;21m"
+    _green = "\x1b[32m"
+    _yellow = "\x1b[33m"
+    _red = "\x1b[31m"
+    _bold_red = "\x1b[31;1m"
+    _reset = "\x1b[0m"
+    _fmt = "%(asctime)s - %(name)s(%(filename)s:%(lineno)d) - %(levelname)s - %(message)s"
 
-    grey = "\x1b[38;21m"
-    green = "\x1b[32m"
-    yellow = "\x1b[33m"
-    red = "\x1b[31m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s(%(filename)s:%(lineno)d) - %(levelname)s - %(message)s "
-
-    FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: green + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
+    _FORMATS = {
+        logging.DEBUG: _grey + _fmt + _reset,
+        logging.INFO: _green + _fmt + _reset,
+        logging.WARNING: _yellow + _fmt + _reset,
+        logging.ERROR: _red + _fmt + _reset,
+        logging.CRITICAL: _bold_red + _fmt + _reset,
     }
 
-    def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt)
+    def format(self, record: logging.LogRecord) -> str:
+        formatter = logging.Formatter(self._FORMATS.get(record.levelno, self._fmt))
         return formatter.format(record)
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+def get_logger(name: str = "yh-stocks", level: str = "INFO") -> logging.Logger:
+    log = logging.getLogger(name)
+    if log.handlers:
+        return log
+    log.setLevel(level.upper())
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(level.upper())
+    if sys.stdout.isatty():
+        handler.setFormatter(_ColorFormatter())
+    else:
+        handler.setFormatter(JsonFormatter("%(asctime)s %(name)s %(levelname)s %(message)s"))
+    log.addHandler(handler)
+    return log
 
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
 
-ch.setFormatter(CustomFormatter())
-logger.addHandler(ch)
+logger = get_logger()
