@@ -37,6 +37,10 @@ def _compute_roi_apy(sym_df):
     """Return (roi%, apy%) from a single-ticker OHLCV+Dividends DataFrame."""
     if sym_df is None or sym_df.empty:
         return None, None
+    # Drop NaN rows introduced by date-index alignment in batch downloads
+    sym_df = sym_df.dropna(subset=['Open'])
+    if sym_df.empty:
+        return None, None
     dividends = sym_df['Dividends'].sum() if 'Dividends' in sym_df.columns else 0
     start_price = sym_df.iloc[0]['Open']
     if start_price == 0:
