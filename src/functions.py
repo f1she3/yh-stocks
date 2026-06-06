@@ -33,142 +33,75 @@ def get_companies_list(name="France", is_index=False, is_country=True):
     return companies
 
 
+def _compute_roi_apy(sym_df):
+    """Return (roi%, apy%) from a single-ticker OHLCV+Dividends DataFrame."""
+    if sym_df is None or sym_df.empty:
+        return None, None
+    dividends = sym_df['Dividends'].sum() if 'Dividends' in sym_df.columns else 0
+    start_price = sym_df.iloc[0]['Open']
+    if start_price == 0:
+        return None, None
+    end_price = sym_df.iloc[-1]['Open']
+    roi = (end_price - start_price + dividends) / start_price * 100
+    apy = dividends / start_price * 100
+    return roi, apy
+
+
 """
 Returns the relevant Key Performance Indicators (KPI)
 of the securities defined in "symbols"
 (APY, Avg APY, ROI)
+
+Uses yf.download() to batch-fetch all symbols per date range, reducing
+API calls from O(symbols * avg_len) to O(avg_len).
 """
 
 
 def calc_kpis(symbols, avg_len):
-    result = {
-        "roi": [],
-        "avgRoi": [],
-        "apy": [],
-        "avgApy": [],
-    }
-    for symbol in symbols:
-        ticker = yf.Ticker(symbol)
+    today = date.today()
 
-        roi = kpi_get_roi(ticker)
-        avg_roi = get_avg_kpi(ticker, years=avg_len, kpi_func=kpi_get_roi)
-        apy = kpi_get_apy(ticker)
-        avg_apy = get_avg_kpi(ticker, years=avg_len, kpi_func=kpi_get_apy)
+    # Range 0: current year. Ranges 1..avg_len: historical years for the avg.
+    current_start = today.replace(year=today.year - 1, month=12, day=31)
+    ranges = [(current_start, today)]
+    for k in range(avg_len):
+        start = today.replace(year=today.year - avg_len + k, month=12, day=31)
+        end = start.replace(year=start.year + 1)
+        if end > today:
+            end = today
+        ranges.append((start, end))
+
+    per_range = [{} for _ in range(len(ranges))]
+
+    for i, (start, end) in enumerate(ranges):
+        batch = yf.download(
+            tickers=symbols,
+            start=start,
+            end=end,
+            actions=True,
+            progress=False,
+            group_by='ticker',
+        )
+        if batch.empty:
+            continue
+        for symbol in symbols:
+            try:
+                sym_df = batch[symbol]
+            except KeyError:
+                continue
+            per_range[i][symbol] = _compute_roi_apy(sym_df)
+
+    result = {"roi": [], "avgRoi": [], "apy": [], "avgApy": []}
+    for symbol in symbols:
+        roi, apy = per_range[0].get(symbol, (None, None))
+
+        hist_rois = [per_range[i].get(symbol, (None, None))[0] for i in range(1, avg_len + 1)]
+        hist_apys = [per_range[i].get(symbol, (None, None))[1] for i in range(1, avg_len + 1)]
+        valid_rois = [v for v in hist_rois if v is not None]
+        valid_apys = [v for v in hist_apys if v is not None]
 
         result["roi"].append(roi)
-        result["avgRoi"].append(avg_roi)
+        result["avgRoi"].append(sum(valid_rois) / len(valid_rois) if valid_rois else None)
         result["apy"].append(apy)
-        result["avgApy"].append(avg_apy)
+        result["avgApy"].append(sum(valid_apys) / len(valid_apys) if valid_apys else None)
+
     return result
-
-
-"""
-APY (yield) = dividends / start price
-
-Calculated 
-    from December 31st, previous year 
-    (
-        to December 31st, this year
-        or 
-        to today's date
-    )
-"""
-
-
-def kpi_get_apy(
-    ticker,
-    # yfinance: Start date included
-    start=date.today().replace(year=date.today().year - 1, month=12, day=31),
-    # yfinance: End date excluded
-    end=date.today()
-):
-    hist = ticker.history(start=start, end=end)
-    apy = None
-    if not hist.empty:
-        if 'Dividends' in hist:
-            dividends = hist['Dividends'].sum()
-        else:
-            dividends = 0
-        # The price at the begining of the year (First row of the dataframe)
-        start_price = hist.iloc[0]['Open']
-        if start_price != 0:
-            apy = dividends / start_price * 100
-        else:
-            logger.warning("Error while calculating the APY for %s", ticker.ticker)
-
-    return apy
-
-
-"""
-ROI (profitability) = end price - start price + dividends / start price
-
-Calculated 
-    from December 31st, previous year (included)
-    (
-        to December 31st, this year (included)
-        or 
-        to today (excluded)
-    )
-"""
-
-
-def kpi_get_roi(
-    ticker,
-    # yfinance: Start date included
-    start=date.today().replace(year=date.today().year - 1, month=12, day=31),
-    # yfinance: End date excluded
-    end=date.today()
-):
-    hist = ticker.history(start=start, end=end)
-    roi = None
-    if not hist.empty:
-        if 'Dividends' in hist:
-            dividends = hist['Dividends'].sum()
-        else:
-            dividends = 0
-        # The price at the begining of the year (First row of the dataframe)
-        start_price = hist.iloc[0]['Open']
-        end_price = hist.iloc[-1]['Open']
-        if start_price != 0:
-            roi = (end_price - start_price + dividends) / start_price * 100
-        else:
-            logger.warning("Error while calculating the ROI for %s", ticker.ticker)
-    return roi
-
-
-"""
-Returns the average value for the KPI function "kpi_func", for the security whose symbol is "symbol",
-for the past "years" years
-
-I chose a year to be
-    from December 31st, previous year
-    to
-    (
-        December 31st, next year
-        or
-        today if (December 31st, next year) > today
-    )
-
-This is the most realiable way I found to have consistent data from yfinance.
-For some reason, if "2000-01-01" is used as "start", 
-the first value returned is "2000-01-02", a day later.
-With "1999-12-31", the first value corresponds indeed to "1999-12-31"
-"""
-
-
-def get_avg_kpi(ticker, years, kpi_func):
-    today = date.today()
-    values = []
-    for k in range(years):
-        start = today.replace(
-            year=today.year-years+k,
-            month=12,
-            day=31
-        )
-        end = start.replace(year=start.year+1)
-        if end > date.today():
-            end = date.today()
-        kpi = kpi_func(ticker=ticker, start=start, end=end)
-        if kpi is not None:
-            values.append(kpi)
-    return sum(values) / len(values) if values else None
