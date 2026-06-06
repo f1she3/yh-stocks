@@ -1,22 +1,18 @@
-[tool.poetry]
-name = "yahoo stocks"
+[project]
+name = "yahoo-stocks"
 version = "0.1.0"
 description = "Simple script to fetch & manipulate stocks data from the Yahoo Finance API for insights"
-authors = ["f1she3 <f1she3@protonmail.com>"]
-license = "MIT"
+authors = [{ name = "f1she3", email = "f1she3@protonmail.com" }]
+license = { text = "MIT" }
 readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pytickersymbols>=1.17.10,<2",
+    "yfinance>=1.2.0,<2",
+    "pandas>=3.0.2,<4",
+    "pyyaml>=6.0.3,<7",
+    "rich>=14.3.3,<16.0.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pytickersymbols = "^1.17.10"
-yfinance = "^1.2.0"
-pandas = "^3.0.2"
-pyyaml = "^6.0.3"
-rich = ">=14.3.3,<16.0.0"
-
-[tool.poetry.group.dev.dependencies]
-poetry = "^2.3.3"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+package = false

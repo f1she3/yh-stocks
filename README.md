@@ -1,11 +1,11 @@
 # yh-stocks
 
 ## Quickstart
-1. Install [Python poetry](https://python-poetry.org/docs/)
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
 2. Install dependencies:<br>
-  `poetry install`
+  `uv sync`
 3. Start the script:<br>
-  `poetry run ./src/main.py`
+  `uv run src/main.py`
 
 ## Credits
 * [ranaroussi](https://github.com/ranaroussi) for his [yfinance](https://github.com/ranaroussi/yfinance) library

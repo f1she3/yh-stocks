@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Install dependencies
-poetry install
+uv sync
 
 # Run the script
-poetry run ./src/main.py
+uv run src/main.py
 ```
 
 No linter or test suite is configured.
