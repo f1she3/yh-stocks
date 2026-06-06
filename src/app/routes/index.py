@@ -18,9 +18,9 @@ def _get_templates(request: Request) -> Jinja2Templates:
 async def index(request: Request) -> HTMLResponse:
     templates = _get_templates(request)
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "countries": _COUNTRIES,
             "indices": _INDICES,
         },

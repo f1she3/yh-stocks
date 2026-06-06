@@ -96,9 +96,9 @@ async def simulate(
         symbols = [r.symbol for r in kpi_rows]
 
         return templates.TemplateResponse(
+            request,
             "partials/results.html",
             {
-                "request": request,
                 "kpi_rows": kpi_rows,
                 "sim": sim_result,
                 "chart_kpi": chart_kpi,
@@ -110,7 +110,8 @@ async def simulate(
 
     except Exception as exc:
         return templates.TemplateResponse(
+            request,
             "partials/error.html",
-            {"request": request, "error": str(exc)},
+            {"error": str(exc)},
             status_code=500,
         )
