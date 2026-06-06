@@ -30,7 +30,7 @@ ENV PATH="/app/.venv/bin:$PATH" \
 RUN mkdir -p /app/cache && chown appuser:appgroup /app/cache
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')" || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
 
 USER appuser
 EXPOSE 8000
