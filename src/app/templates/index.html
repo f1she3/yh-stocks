@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}yh-stocks — Simulateur d'investissement{% endblock %}
+
+{% block body %}
+<div class="layout">
+
+  <!-- Sidebar: form -->
+  <aside class="sidebar">
+    <h1>yh-stocks</h1>
+    <p class="subtitle">Simulateur d'investissement boursier<br>avec fiscalité française</p>
+
+    <form
+      hx-post="/simulate"
+      hx-target="#results"
+      hx-swap="innerHTML"
+      hx-indicator="#spinner"
+    >
+      <h3>Sélection</h3>
+
+      <div class="form-group">
+        <label for="search_type">Type de recherche</label>
+        <select id="search_type" name="search_type" onchange="toggleNameField(this.value)">
+          <option value="stock">Action (symbole)</option>
+          <option value="index" selected>Indice</option>
+          <option value="country">Pays</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="field-stock" style="display:none">
+        <label for="name-stock">Symbole Yahoo Finance</label>
+        <input id="name-stock" type="text" placeholder="ex: MC.PA" />
+      </div>
+
+      <div class="form-group" id="field-index">
+        <label for="name-index">Indice</label>
+        <select id="name-index" name="name">
+          {% for idx in indices %}
+          <option value="{{ idx }}" {% if idx == "CAC 40" %}selected{% endif %}>{{ idx }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group" id="field-country" style="display:none">
+        <label for="name-country">Pays</label>
+        <select id="name-country">
+          {% for c in countries %}
+          <option value="{{ c }}" {% if c == "France" %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <hr class="divider">
+      <h3>Paramètres d'investissement</h3>
+
+      <div class="form-group">
+        <label for="apport_initial">Apport initial (€)</label>
+        <input id="apport_initial" name="apport_initial" type="number" min="1" step="100" value="10000" required>
+      </div>
+
+      <div class="form-group">
+        <label for="versement_mensuel">Versement mensuel (€)</label>
+        <input id="versement_mensuel" name="versement_mensuel" type="number" min="0" step="50" value="500" required>
+      </div>
+
+      <div class="form-group">
+        <label for="horizon_years">Horizon (années)</label>
+        <input id="horizon_years" name="horizon_years" type="number" min="1" max="50" value="20" required>
+      </div>
+
+      <hr class="divider">
+      <h3>Enveloppe fiscale</h3>
+
+      <div class="form-group">
+        <label for="account_type">Comparer</label>
+        <select id="account_type" name="account_type">
+          <option value="ALL" selected>CTO + PEA + AV (comparaison)</option>
+          <option value="CTO">CTO uniquement</option>
+          <option value="PEA">PEA uniquement</option>
+          <option value="AV">Assurance-vie uniquement</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="is_couple" value="true">
+          Situation de couple (abattement AV 9 200 €/an)
+        </label>
+      </div>
+
+      <hr class="divider">
+      <h3>Frais</h3>
+
+      <div class="form-group">
+        <label for="courtage_pct">Courtage (% par versement)</label>
+        <input id="courtage_pct" name="courtage_pct" type="number" min="0" max="5" step="0.01" value="0.10">
+      </div>
+
+      <div class="form-group">
+        <label for="frais_garde_pct">Frais de garde (% / an)</label>
+        <input id="frais_garde_pct" name="frais_garde_pct" type="number" min="0" max="2" step="0.01" value="0.10">
+      </div>
+
+      <div class="form-group">
+        <label for="frais_gestion_av_pct">Frais de gestion AV (% / an)</label>
+        <input id="frais_gestion_av_pct" name="frais_gestion_av_pct" type="number" min="0" max="2" step="0.01" value="0.75">
+      </div>
+
+      <hr class="divider">
+      <h3>Données historiques</h3>
+
+      <div class="form-group">
+        <label for="avg_len">Fenêtre de moyenne (années)</label>
+        <input id="avg_len" name="avg_len" type="number" min="1" max="20" value="10">
+      </div>
+
+      <button class="btn" type="submit">Calculer</button>
+
+      <div id="spinner">
+        <div class="spinner-ring"></div>
+        Récupération des données…
+      </div>
+    </form>
+  </aside>
+
+  <!-- Main: results swap target -->
+  <main class="main">
+    <div id="results">
+      <div style="color: var(--text-muted); font-size: 13px; margin-top: 60px; text-align: center;">
+        Remplissez le formulaire et cliquez sur <strong>Calculer</strong>.
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+function toggleNameField(type) {
+  ['stock', 'index', 'country'].forEach(t => {
+    document.getElementById('field-' + t).style.display = t === type ? '' : 'none';
+  });
+  // Update the actual name input name attribute
+  const active = document.querySelector('#field-' + type + ' input, #field-' + type + ' select');
+  if (active) active.name = 'name';
+  // Remove name from hidden fields
+  ['stock', 'index', 'country'].filter(t => t !== type).forEach(t => {
+    const el = document.querySelector('#field-' + t + ' input, #field-' + t + ' select');
+    if (el) el.removeAttribute('name');
+  });
+}
+// Init
+toggleNameField(document.getElementById('search_type').value);
+</script>
+{% endblock %}

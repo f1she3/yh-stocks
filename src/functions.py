@@ -1,70 +1,76 @@
-from pytickersymbols import PyTickerSymbols
-import yfinance as yf
 from datetime import date
+
+import pandas as pd
+import yfinance as yf
+from pytickersymbols import PyTickerSymbols
+
 from logger_config import logger
 
-"""
-Returns the yahoo symbols of all the companies
-belonging to the specified index or country
-"""
 
-
-def get_companies_list(name="France", is_index=False, is_country=True):
+def get_companies_list(name: str = "France", is_index: bool = False, is_country: bool = True) -> dict:
     stock_data = PyTickerSymbols()
     if is_country:
         raw_symbols = list(stock_data.get_stocks_by_country(name))
     elif is_index:
         raw_symbols = list(stock_data.get_stocks_by_index(name))
     else:
-        raise Exception(
-            "get_companies_list() : The symbol must either be an index or a country.")
-    companies = {
-        "names": [],
-        "symbols": []
-    }
+        raise ValueError("get_companies_list(): must specify is_index or is_country")
+    companies: dict = {"names": [], "symbols": []}
     for company in raw_symbols:
-        name = company['name']
-        symbols = company.get('symbols', [])
-        if len(symbols) > 0:
-            # Get the company's symbol on Yahoo Finance
-            symbol = symbols[0]['yahoo']
-            companies["names"].append(name)
-            companies["symbols"].append(symbol)
+        symbols = company.get("symbols", [])
+        if symbols:
+            companies["names"].append(company["name"])
+            companies["symbols"].append(symbols[0]["yahoo"])
     return companies
 
 
-def _compute_roi_apy(sym_df):
-    """Return (roi%, apy%) from a single-ticker OHLCV+Dividends DataFrame."""
+def _compute_roi_apy(sym_df: pd.DataFrame | None) -> tuple[float | None, float | None]:
     if sym_df is None or sym_df.empty:
         return None, None
-    # Drop NaN rows introduced by date-index alignment in batch downloads
-    sym_df = sym_df.dropna(subset=['Open'])
+    sym_df = sym_df.dropna(subset=["Open"])
     if sym_df.empty:
         return None, None
-    dividends = sym_df['Dividends'].sum() if 'Dividends' in sym_df.columns else 0
-    start_price = sym_df.iloc[0]['Open']
+    dividends = sym_df["Dividends"].sum() if "Dividends" in sym_df.columns else 0.0
+    start_price = float(sym_df.iloc[0]["Open"])
     if start_price == 0:
         return None, None
-    end_price = sym_df.iloc[-1]['Open']
+    end_price = float(sym_df.iloc[-1]["Open"])
     roi = (end_price - start_price + dividends) / start_price * 100
     apy = dividends / start_price * 100
     return roi, apy
 
 
-"""
-Returns the relevant Key Performance Indicators (KPI)
-of the securities defined in "symbols"
-(APY, Avg APY, ROI)
+def _download_batch(
+    symbols: list[str],
+    start: date,
+    end: date,
+    timeout: int = 30,
+) -> pd.DataFrame:
+    try:
+        return yf.download(
+            tickers=symbols,
+            start=start,
+            end=end,
+            actions=True,
+            progress=False,
+            group_by="ticker",
+            timeout=timeout,
+        )
+    except Exception as exc:
+        logger.warning("yf.download failed for batch: %s", exc)
+        return pd.DataFrame()
 
-Uses yf.download() to batch-fetch all symbols per date range, reducing
-API calls from O(symbols * avg_len) to O(avg_len).
-"""
 
+def calc_kpis(symbols: list[str], avg_len: int = 10, timeout: int = 30) -> dict:
+    """
+    Returns ROI/APY KPIs for each symbol.
 
-def calc_kpis(symbols, avg_len):
+    Keys in the returned dict:
+      roi, avgRoi, apy, avgApy      — scalar per symbol (existing contract)
+      roiSeries, apySeries          — list[list[float|None]] of per-year values per symbol
+    """
     today = date.today()
 
-    # Range 0: current year. Ranges 1..avg_len: historical years for the avg.
     current_start = today.replace(year=today.year - 1, month=12, day=31)
     ranges = [(current_start, today)]
     for k in range(avg_len):
@@ -74,17 +80,10 @@ def calc_kpis(symbols, avg_len):
             end = today
         ranges.append((start, end))
 
-    per_range = [{} for _ in range(len(ranges))]
+    per_range: list[dict] = [{} for _ in range(len(ranges))]
 
     for i, (start, end) in enumerate(ranges):
-        batch = yf.download(
-            tickers=symbols,
-            start=start,
-            end=end,
-            actions=True,
-            progress=False,
-            group_by='ticker',
-        )
+        batch = _download_batch(symbols, start, end, timeout=timeout)
         if batch.empty:
             continue
         for symbol in symbols:
@@ -94,7 +93,14 @@ def calc_kpis(symbols, avg_len):
                 continue
             per_range[i][symbol] = _compute_roi_apy(sym_df)
 
-    result = {"roi": [], "avgRoi": [], "apy": [], "avgApy": []}
+    result: dict = {
+        "roi": [],
+        "avgRoi": [],
+        "apy": [],
+        "avgApy": [],
+        "roiSeries": [],
+        "apySeries": [],
+    }
     for symbol in symbols:
         roi, apy = per_range[0].get(symbol, (None, None))
 
@@ -107,5 +113,7 @@ def calc_kpis(symbols, avg_len):
         result["avgRoi"].append(sum(valid_rois) / len(valid_rois) if valid_rois else None)
         result["apy"].append(apy)
         result["avgApy"].append(sum(valid_apys) / len(valid_apys) if valid_apys else None)
+        result["roiSeries"].append(hist_rois)
+        result["apySeries"].append(hist_apys)
 
     return result

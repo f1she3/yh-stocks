@@ -1,0 +1,34 @@
+<div style="overflow-x:auto">
+<table>
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Symbole</th>
+      <th class="num">ROI (%)</th>
+      <th class="num">ROI moy. (%)</th>
+      <th class="num">APY (%)</th>
+      <th class="num">APY moy. (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in kpi_rows %}
+    <tr>
+      <td>{{ r.name }}</td>
+      <td>{{ r.symbol }}</td>
+      <td class="num {% if r.roi_pct and r.roi_pct > 0 %}positive{% elif r.roi_pct %}negative{% endif %}">
+        {% if r.roi_pct is not none %}{{ "%.1f"|format(r.roi_pct) }}{% else %}—{% endif %}
+      </td>
+      <td class="num {% if r.avg_roi_pct and r.avg_roi_pct > 0 %}positive{% elif r.avg_roi_pct %}negative{% endif %}">
+        {% if r.avg_roi_pct is not none %}{{ "%.1f"|format(r.avg_roi_pct) }}{% else %}—{% endif %}
+      </td>
+      <td class="num">
+        {% if r.apy_pct is not none %}{{ "%.2f"|format(r.apy_pct) }}{% else %}—{% endif %}
+      </td>
+      <td class="num">
+        {% if r.avg_apy_pct is not none %}{{ "%.2f"|format(r.avg_apy_pct) }}{% else %}—{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

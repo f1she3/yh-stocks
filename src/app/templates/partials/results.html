@@ -1,0 +1,81 @@
+<!-- AMF disclaimers -->
+<div class="disclaimer">
+  <strong>Avertissements réglementaires</strong>
+  Les performances passées ne préjugent pas des performances futures. Les projections sont fondées sur des données historiques et des hypothèses qui peuvent ne pas se réaliser. La valeur de votre investissement peut baisser comme monter et vous pourriez ne pas récupérer la totalité du capital investi. Cet outil est fourni à titre purement informatif et ne constitue pas un conseil en investissement au sens de la directive MIF II. Les simulations fiscales sont indicatives — consultez un conseiller fiscal agréé pour valider votre situation personnelle.
+</div>
+
+{% if sim.pea_cap_warning %}
+<div class="warning-badge">
+  ⚠ Plafond PEA (150 000 €) atteint à l'année {{ sim.pea_cap_hit_year }} — les versements excédentaires ne sont pas pris en compte dans le scénario PEA.
+</div>
+{% endif %}
+
+{% if horizon_years < 5 %}
+<div class="warning-badge">
+  ⚠ Horizon &lt; 5 ans : un retrait PEA avant 5 ans est taxé à 30 % (PFU) et entraîne la clôture du plan.
+</div>
+{% endif %}
+
+{% if horizon_years < 8 %}
+<div class="warning-badge">
+  ⚠ Horizon &lt; 8 ans : l'assurance-vie ne bénéficie pas du taux réduit (7,5 %) ni de l'abattement. L'imposition est celle du PFU (30 %).
+</div>
+{% endif %}
+
+<!-- Summary cards -->
+{% set last = sim.snapshots[-1] %}
+<div class="cards-row">
+  <div class="card">
+    <div class="card-title">Valeur brute finale</div>
+    <div class="card-value">{{ "{:,.0f}".format(last.gross_value).replace(",", " ") }} €</div>
+    <div class="card-sub">CAGR historique : {{ "%.1f"|format(sim.cagr) }}%</div>
+  </div>
+  <div class="card">
+    <div class="card-title">CTO net</div>
+    <div class="card-value">{{ "{:,.0f}".format(last.cto_net).replace(",", " ") }} €</div>
+    <div class="card-sub">TRI : {% if sim.cto_irr %}{{ "%.1f"|format(sim.cto_irr * 100) }}%{% else %}N/A{% endif %}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">PEA net</div>
+    <div class="card-value">{{ "{:,.0f}".format(last.pea_net).replace(",", " ") }} €</div>
+    <div class="card-sub">TRI : {% if sim.pea_irr %}{{ "%.1f"|format(sim.pea_irr * 100) }}%{% else %}N/A{% endif %}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">AV net</div>
+    <div class="card-value">{{ "{:,.0f}".format(last.av_net).replace(",", " ") }} €</div>
+    <div class="card-sub">TRI : {% if sim.av_irr %}{{ "%.1f"|format(sim.av_irr * 100) }}%{% else %}N/A{% endif %}</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('projection')">Projection</button>
+  <button class="tab-btn" onclick="showTab('kpis')">KPIs historiques</button>
+  <button class="tab-btn" onclick="showTab('table')">Tableau annuel</button>
+</div>
+
+<!-- Tab: projection chart -->
+<div id="tab-projection" class="tab-panel active">
+  <div class="chart-wrap">{{ chart_proj | safe }}</div>
+</div>
+
+<!-- Tab: KPI chart -->
+<div id="tab-kpis" class="tab-panel">
+  <div class="chart-wrap">{{ chart_kpi | safe }}</div>
+  <h2>Détail par titre</h2>
+  {% include "partials/kpi_table.html" %}
+</div>
+
+<!-- Tab: year-by-year table -->
+<div id="tab-table" class="tab-panel">
+  {% include "partials/simulation_table.html" %}
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

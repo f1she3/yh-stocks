@@ -1,0 +1,22 @@
+services:
+  web:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./cache:/app/cache
+    environment:
+      - LOG_LEVEL=DEBUG
+      - CACHE_TTL_SECONDS=3600
+      - CACHE_DIR=/app/cache
+      - YF_TIMEOUT=30
+      - AVG_LEN=10
+    command: >
+      uvicorn app.server:app
+        --host 0.0.0.0
+        --port 8000
+        --reload
+        --reload-dir /app/src
